@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Connect Four</title>
+  <script
+    src='https://code.jquery.com/jquery-3.4.1.min.js'
+    integrity='sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo='
+    crossorigin='anonymous'></script>
+  <script
+    src='https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js'
+    integrity='sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM'
+    crossorigin='anonymous'></script>
+  <script
+    src='index.js'></script>
+  <link
+    href='https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css'
+    rel='stylesheet'
+    integrity='sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T'
+    crossorigin='anonymous'/>
+  <link
+    rel='stylesheet'
+    href='style.css'>
+</head>
+<body>
+  <div class='container'>
+    <h1 id='message-player' class='text-center'>Connect Four</h1>
+    <div id='game'></div>
+  </div>
+
+  <div class='modal' id='modal-win' tabindex='-1' role='dialog'>
+    <div class='modal-dialog' role='document'>
+      <div class='modal-content'>
+        <div class='modal-header'>
+          <h5 class='modal-title' id='message-win'></h5>
+        </div>
+        <div class='modal-footer'>
+          <button type='button' class='btn btn-secondary' data-dismiss='modal'>Ok</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class='modal' id='modal-color' tabindex='-1' role='dialog'>
+    <div class='modal-dialog' role='document'>
+      <div class='modal-content'>
+        <div class='modal-header'>
+          <h5 class='modal-title'>Player 1 - Please choose your color.</h5>
+        </div>
+        <div class='modal-footer'>
+          <button type='button' class='btn btn-danger choose-color' data-color='red' data-dismiss='modal'>Red</button>
+          <button type='button' class='btn btn-secondary choose-color' data-color='black' data-dismiss='modal'>Black</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
