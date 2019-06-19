@@ -43,7 +43,7 @@ $(function() {
   $('#game').append(divRow);
 
   // Show the color selection modal to kick off the game
-  $('#modal-color').modal();
+  $('#modal-color').modal({backdrop: 'static', keyboard: false});
 
 
   /* ----------------
@@ -104,9 +104,12 @@ $(function() {
 
   // Place a color in a column
   function placeInCol(col, color) {
+    // Find the first empty row
     var row = 0;
     while (data[col][row]) row++;
     if (row >= ROWS) return;
+
+    // Add the color to the game board
     data[col][row] = color;
     $('.circle').filter(function() {
       return $(this).data('col') == col && $(this).data('row') == row;
@@ -117,87 +120,51 @@ $(function() {
   function checkGameOver() {
     if (isGameOver) return true;
 
-    var currColor = getColor();
-    
     // Check for vertical sequence
     for (var col = 0; col < COLS; col++) {
-      var currCount = 0;
-      for (var row = 0; row < ROWS; row++) {
+      for (var row = 0; row < ROWS - 3; row++) {
         var color = data[col][row];
-        if (!color) break;
-        if (color === currColor) currCount++;
-        else currCount = 0;
-
-        if (currCount >= 4) return setGameOver();
+        if (!color) break; // Can quit early if we reach the end of a column
+        if (color === data[col][row + 1] &&
+            color === data[col][row + 2] &&
+            color === data[col][row + 3])
+          return setGameOver(col, 0, row, 1);
       }
     }
 
     // Check for horizontal sequence
-    for (var row = 0; row < ROWS; row++) {
-      var currCount = 0;
-      for (var col = 0; col < COLS; col++) {
+    for (var col = 0; col < COLS - 3; col++) {
+      for (var row = 0; row < ROWS; row++) {
         var color = data[col][row];
-        if (color === currColor) currCount++;
-        else currCount = 0;
-
-        if (currCount >= 4) return setGameOver();
+        if (!color) continue;
+        if (color === data[col + 1][row] &&
+            color === data[col + 2][row] &&
+            color === data[col + 3][row])
+          return setGameOver(col, 1, row, 0);
       }
     }
 
     // Check for diagonal sequence
-    for (var col = 0; col < COLS; col++) {
-      var currCount = 0;
-      for (var i = 0; col + i < COLS && i < ROWS; i++) {
-        var checkCol = col + i;
-        var checkRow = i;
-        var color = data[checkCol][checkRow];
-        if (!color) break;
-        if (color === currColor) currCount++;
-        else currCount = 0;
-
-        if (currCount >= 4) return setGameOver();
+    for (var col = 0; col < COLS - 3; col++) {
+      for (var row = 0; row < ROWS - 3; row++) {
+        var color = data[col][row];
+        if (!color) continue;
+        if (color === data[col + 1][row + 1] &&
+            color === data[col + 2][row + 2] &&
+            color === data[col + 3][row + 3])
+          return setGameOver(col, 1, row, 1);
       }
     }
 
-    for (var col = COLS - 1; col >= 0; col--) {
-      var currCount = 0;
-      for (var i = 0; col - i >= 0 && i < ROWS; i++) {
-        var checkCol = col - i;
-        var checkRow = i;
-        var color = data[checkCol][checkRow];
-        if (!color) break;
-        if (color === currColor) currCount++;
-        else currCount = 0;
-
-        if (currCount >= 4) return setGameOver();
-      }
-    }
-
-    for (var row = 0; row < ROWS; row++) {
-      var currCount = 0;
-      for (var i = 0; i < COLS && row + i < ROWS; i++) {
-        var checkCol = i;
-        var checkRow = row + i;
-        var color = data [checkCol][checkRow];
-        if (!color) break;
-        if (color === currColor) currCount++;
-        else currCount = 0;
-
-        if (currCount >= 4) return setGameOver();
-      }
-    }
-
-    for (var row = 0; row < ROWS; row++) {
-      var currCount = 0;
-      for (var i = 0; COLS - 1 - i >= 0 && row + i < ROWS; i++) {
-        var checkCol = COLS - 1 - i;
-        var checkRow = row + i;
-        var color = data [checkCol][checkRow];
-        if (!color) break;
-        if (color === currColor) currCount++;
-        else currCount = 0;
-
-        if (currCount >= 4) return setGameOver();
+    // Check for reverse diagonal sequence
+    for (var col = 0; col < COLS - 3; col++) {
+      for (var row = 3; row < ROWS; row++) {
+        var color = data[col][row];
+        if (!color) continue;
+        if (color === data[col + 1][row - 1] &&
+            color === data[col + 2][row - 2] &&
+            color === data[col + 3][row - 3])
+          return setGameOver(col, 1, row, -1);
       }
     }
 
@@ -206,24 +173,32 @@ $(function() {
     return false;
   }
 
-  // Mark the game as a tie. Returns true
+  // Set the game as a tie. Returns true
   function setGameTie() {
     isGameTie = true;
     return setGameOver();
   }
 
-  // Mark the game as over. Returns true
-  function setGameOver() {
+  // Set the game as over. Returns true
+  function setGameOver(col, colDelta, row, rowDelta) {
+    // Mark the winning circles
+    if (col >= 0 && row >= 0) {
+      for (var i = 0; i < 4; i++) {
+        $('.circle').filter(function() {
+          return $(this).data('col') == col + i * colDelta && $(this).data('row') == row + i * rowDelta;
+        }).first().addClass('win');
+      }
+    }
     isGameOver = true;
     return true;
   }
 
-  // Sets the player message
+  // Set the player message
   function setMessagePlayer() {
     $('#message-player').text(capitalize(getColor()) + ' player - Take turn.');
   }
 
-  // Sets the winner message and displays the win modal
+  // Set the winner message and display the win modal
   function setMessageWinner() {
     var message = isGameTie ? 'Tie game!' : capitalize(getColor()) + ' player wins!';
     $('#message-player').text(message);
